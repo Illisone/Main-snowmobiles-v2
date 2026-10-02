@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* ============================================================
-     SHARE APP LINK + iOS SAFARI REDIRECT + OVERLAY
+     ПРОСТОЙ ПЕРЕХОД НА ПРИЛОЖЕНИЕ
      ============================================================ */
 
   const APP_URL = "http://www.sibxtrim.ru/";
@@ -18,12 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  function isAndroid() {
-    return /Android/i.test(navigator.userAgent);
-  }
-
   function isSafari() {
-    // Safari — единственный браузер на iOS, который не содержит CriOS, FxiOS и т.д.
     return (
       isIOS() &&
       /Safari/.test(navigator.userAgent) &&
@@ -32,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function isInAppBrowser() {
-    // Встроенные браузеры (Telegram, Instagram, VK, Facebook, TikTok и т.д.)
     const ua = navigator.userAgent || "";
     return (
       isIOS() &&
@@ -41,179 +35,22 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  async function shareApp() {
-    const shareData = {
-      title: "x3m — BRP Ski-Doo",
-      text: "Установите приложение x3m — снегоходы BRP Ski-Doo и Lynx",
-      url: APP_URL,
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-        return true;
-      } catch (err) {
-        if (err && err.name === "AbortError") return true;
-        console.warn("[share] failed:", err);
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(APP_URL);
-      showToast(
-        "Ссылка скопирована. Откройте её в Safari и установите приложение.",
-      );
-    } catch {
-      showToast("Откройте " + APP_URL + " в Safari и установите приложение.");
-    }
-    return false;
-  }
-
-  // Открыть ссылку в Safari из встроенного браузера
-  function openInSafari(url) {
-    // x-safari-https:// — недокументированная схема, работает на iOS
-    // для принудительного открытия ссылки в Safari
-    const httpsUrl = url.replace(/^http:/, "https:");
-    const safariUrl = "x-safari-" + httpsUrl;
-    window.location.href = safariUrl;
-  }
-
-  async function handleInstallClick(platform) {
-    // iOS-специфичная логика
-    if (platform === "ios" || (platform === "auto" && isIOS())) {
-      // Если открыто во встроенном браузере (Telegram, Instagram и т.д.) —
-      // пробуем перебросить в Safari
-      if (isInAppBrowser() && !isSafari()) {
-        openInSafari(APP_URL);
-
-        // Если через 1.5 сек всё ещё здесь — показываем оверлей
-        setTimeout(() => {
-          showIOSOverlay();
-        }, 1500);
-        return;
-      }
-
-      // Уже в Safari — показываем оверлей с подсказкой
-      showIOSOverlay();
+  function handleInstallClick() {
+    // iOS: если открыто во встроенном браузере — перебрасываем в Safari
+    if (isIOS() && isInAppBrowser() && !isSafari()) {
+      const safariUrl = "x-safari-" + APP_URL;
+      window.location.href = safariUrl;
       return;
     }
 
-    // Android / десктоп — обычный share
-    await shareApp();
-  }
-
-  /* ============================================================
-     iOS OVERLAY: подсветка кнопки «Поделиться» в Safari
-     ============================================================ */
-
-  function showIOSOverlay() {
-    const old = document.getElementById("ios-overlay");
-    if (old) old.remove();
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const overlay = document.createElement("div");
-    overlay.id = "ios-overlay";
-    overlay.className = "ios-overlay";
-
-    overlay.innerHTML = `
-      <div class="ios-overlay__backdrop"></div>
-
-      <div class="ios-overlay__top">
-        <div class="ios-overlay__badge">
-          <span class="ios-overlay__step">1</span>
-          <span>Нажмите <strong>«Поделиться»</strong></span>
-        </div>
-        <div class="ios-overlay__arrow-down">
-          <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
-            <path d="M20 0 V 45" stroke="#0063c7" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6">
-              <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
-            </path>
-            <path d="M10 38 L 20 50 L 30 38" stroke="#0063c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
-        </div>
-      </div>
-
-      <div class="ios-overlay__pulse"></div>
-
-      <button type="button" class="ios-overlay__close">Понятно</button>
-    `;
-
-    document.body.appendChild(overlay);
-
-    requestAnimationFrame(() => {
-      overlay.classList.add("ios-overlay--visible");
-    });
-
-    const close = () => {
-      overlay.classList.remove("ios-overlay--visible");
-      setTimeout(() => {
-        overlay.remove();
-        document.body.style.overflow = prevOverflow;
-      }, 250);
-    };
-
-    overlay
-      .querySelector(".ios-overlay__close")
-      .addEventListener("click", close);
-    overlay
-      .querySelector(".ios-overlay__backdrop")
-      .addEventListener("click", close);
-
-    setTimeout(() => {
-      if (document.getElementById("ios-overlay")) close();
-    }, 12000);
-  }
-
-  /* ============================================================
-     TOAST
-     ============================================================ */
-
-  function showToast(message) {
-    let toast = document.getElementById("app-toast");
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "app-toast";
-      toast.style.cssText = `
-        position: fixed;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%) translateY(20px);
-        background: rgba(0,99,199,0.95);
-        color: #fff;
-        padding: 14px 22px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity .3s, transform .3s;
-        max-width: 90vw;
-        text-align: center;
-        pointer-events: none;
-      `;
-      document.body.appendChild(toast);
-    }
-    toast.textContent = message;
-    requestAnimationFrame(() => {
-      toast.style.opacity = "1";
-      toast.style.transform = "translateX(-50%) translateY(0)";
-    });
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateX(-50%) translateY(20px)";
-    }, 3500);
+    // Всё остальное — просто открываем приложение
+    window.open(APP_URL, "_blank");
   }
 
   window.handleInstallClick = handleInstallClick;
-  window.shareApp = shareApp;
-  window.showIOSOverlay = showIOSOverlay;
 
   /* ============================================================
-     КОНЕЦ SHARE-БЛОКА
+     КОНЕЦ БЛОКА
      ============================================================ */
 
   const navbar = document.getElementById("navbar");

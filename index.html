@@ -1,0 +1,1365 @@
+<!doctype html>
+<html lang="ru" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>x3m</title>
+    <meta
+      name="description"
+      content="Продажа снегоходов BRP Ski-Doo Skandic и Expedition в Новосибирске. Цены от 2 130 000 ₽"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "slate-dark": "#0a0a0a",
+              "slate-card": "#141414",
+              "slon-blue": "#0063c7",
+              "slon-blue-hover": "#0052a3",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <base target="_blank" />
+  </head>
+
+  <body class="bg-slate-dark text-white font-sans antialiased">
+    <canvas
+      id="snow-canvas"
+      class="fixed inset-0 pointer-events-none z-[1] transition-opacity duration-500"
+    ></canvas>
+
+    <nav
+      id="navbar"
+      class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 pointer-events-none"
+    >
+      <div
+        id="scroll-progress"
+        class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-slon-blue via-blue-400 to-slon-blue shadow-[0_0_10px_rgba(0,99,199,0.8)] z-[100] transition-all duration-100"
+        style="width: 0%"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div
+          class="glass-nav rounded-2xl border border-gray-700/50 bg-black/40 backdrop-blur-xl shadow-2xl shadow-black/50 pointer-events-auto relative overflow-hidden"
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-slon-blue/5 via-transparent to-slon-blue/5 pointer-events-none"
+          ></div>
+
+          <div
+            class="relative flex justify-between items-center h-[55px] px-6 lg:px-8"
+          >
+            <a
+              href="#"
+              onclick="scrollToTop(event)"
+              class="flex items-center space-x-2 sm:space-x-3 group no-underline hover:no-underline cursor-pointer"
+            >
+              <svg
+                id="nav-arrow"
+                class="w-5 h-5 lg:hidden text-white/60 hover:text-white transition-all duration-300 opacity-0 -translate-x-2"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 19l-7-7 7-7" />
+                <path d="M5 12h14" />
+              </svg>
+              <img
+                src=""
+                alt=""
+                class="h-8 sm:h-10 w-auto object-contain group-hover:scale-110 transition-transform drop-shadow-lg"
+              />
+              <span
+                class="text-base sm:text-xl font-bold tracking-tight drop-shadow-lg"
+                >x3m</span
+              >
+            </a>
+
+            <div class="hidden lg:flex items-center space-x-4 xl:space-x-6">
+              <a
+                href="#models"
+                class="relative text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider nav-link whitespace-nowrap"
+                >Модели</a
+              >
+              <a
+                href="#app"
+                class="relative text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider nav-link whitespace-nowrap"
+                >Приложение</a
+              >
+              <a
+                href="#gallery"
+                class="relative text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider nav-link whitespace-nowrap"
+                >Галерея</a
+              >
+              <a
+                href="#contacts"
+                class="relative text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider nav-link whitespace-nowrap"
+                >Контакты</a
+              >
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <a
+                href="#app"
+                class="hidden sm:flex items-center px-5 py-2.5 bg-slon-blue/20 hover:bg-slon-blue/40 border border-slon-blue/50 hover:border-slon-blue text-white text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,99,199,0.4)] backdrop-blur-sm uppercase tracking-wide no-underline"
+              >
+                Приложение
+                <svg
+                  class="w-4 h-4 ml-2"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </a>
+
+              <button
+                id="mobile-menu-btn"
+                class="lg:hidden text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg backdrop-blur-sm transition-colors"
+              >
+                <i data-lucide="menu" class="w-6 h-6"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden lg:hidden mt-2 pointer-events-auto">
+          <div
+            class="glass-nav rounded-2xl border border-gray-700/50 bg-black/80 backdrop-blur-xl p-5 shadow-2xl"
+          >
+            <div class="space-y-1">
+              <a
+                href="#models"
+                class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                >Модели</a
+              >
+              <a
+                href="#app"
+                class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                >Приложение</a
+              >
+              <a
+                href="#gallery"
+                class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                >Галерея</a
+              >
+              <a
+                href="#contacts"
+                class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                >Контакты</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section
+      id="hero"
+      class="relative h-screen flex items-center justify-center overflow-hidden"
+    >
+      <div class="absolute inset-0 z-0">
+        <video
+          id="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster="images/wp11807979.png"
+          class="w-full h-full object-cover"
+        >
+          <source src="video/hero-bg.mp4" type="video/mp4" />
+          <source src="video/hero-bg.webm" type="video/webm; codecs=vp9" />
+          <img
+            src="images/wp11807979.png"
+            alt="BRP Ski-Doo в горах"
+            class="w-full h-full object-cover"
+          />
+        </video>
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-slate-dark"
+        ></div>
+      </div>
+
+      <div
+        class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20"
+      >
+        <h1
+          class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-tight mb-6 drop-shadow-lg text-gray-200"
+        >
+          BRP SKI-DOO<br />
+          2027
+        </h1>
+
+        <div class="max-w-2xl mx-auto mb-10">
+          <p
+            class="text-lg sm:text-xl text-white font-light leading-relaxed drop-shadow-lg"
+          >
+            Минимальная цена на рынке — это наше условие.<br />
+            Нашли дешевле? Мы сделаем еще ниже!
+          </p>
+        </div>
+
+        <div class="flex justify-center">
+          <a
+            href="#app"
+            class="inline-flex items-center justify-center px-8 py-4 glass-button text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 group"
+          >
+            <svg
+              class="w-5 h-5 mr-2 transition-transform group-hover:scale-110"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+            Скачать приложение
+          </a>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-white/50"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </div>
+    </section>
+
+    <section
+      class="py-6 bg-gradient-to-r from-slon-blue/20 via-slate-dark to-slon-blue/20 border-y border-slon-blue/20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 flex-shrink-0 flex items-center justify-center glass-icon rounded-full"
+            >
+              <svg
+                class="w-7 h-7 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">
+                Устанавливай приложение — будь в курсе всех поступлений и
+                новинок!
+              </h3>
+            </div>
+          </div>
+          <a
+            href="#app"
+            class="inline-flex items-center px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all duration-300"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+            Установить
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="models" class="py-16 sm:py-24 bg-slate-dark">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16">
+          <h2
+            class="text-2xl sm:text-4xl font-bold mb-4 text-white uppercase tracking-wide"
+          >
+            Модели в наличии и под заказ
+          </h2>
+          <p class="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
+            Прямые поставки BRP. Лучшие цены на рынке.
+          </p>
+          <div
+            class="w-20 h-1 bg-slon-blue mx-auto rounded-full mt-4 sm:mt-6"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/expedition-xtreme.png"
+                alt="BRP Expedition Xtreme 900 ACE Turbo R 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Expedition Xtreme 900 ACE Turbo R
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE Turbo R • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Премиальный кроссовер на платформе REV Gen5: 180 л.с. и гусеница
+                50 сантиметров для самых требовательных приключений.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('expedition-xtreme-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 520 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    180 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/skandic-le.png"
+                alt="BRP Skandic LE 24 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Skandic LE 24"
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Флагманский утилитарный снегоход на новой платформе REV Gen5.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('skandic-le-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 190 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    95 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/skandic-se.png"
+                alt="BRP Skandic SE 24 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Skandic SE 24"
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Утилитарный снегоход с акцентом на комфорт и технологии.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('skandic-se-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 260 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    95 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/expedition-le.png"
+                alt="BRP Expedition LE 20 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Expedition LE 20"
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Кроссоверный утилитарник на новой платформе REV Gen5: 95 л.с.,
+                гусеница 20 дюймов и баланс между работой и приключениями.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('expedition-le-20-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 130 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    95 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/expedition-le-turbo.png"
+                alt="BRP Expedition LE 20 Turbo R 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Expedition LE 20" Turbo R
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Флагманский кроссовер-утилитарник на платформе REV Gen5: 180
+                л.с. и гусеница 20 дюймов.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('expedition-le-20-turbo-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 420 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    180 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/expedition-se-turbo.png"
+                alt="BRP Expedition SE 20 Turbo R 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Expedition SE 20" Turbo R
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                900 ACE • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Топовый кроссовер-утилитарник на платформе REV Gen5: 180 л.с.,
+                20-дюймовый трак и премиальный комфорт с дисплеем 10,25″ и
+                кофром LinQ на 135 л.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('expedition-se-20-turbo-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 620 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    180 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/summit.png"
+                alt="BRP Summit Expert Turbo R 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                BRP Summit Expert Turbo R
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                Turbo R • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Эталонный горный снегоход на легкой платформе REV Gen5 для самых
+                техничных склонов: 180 л.с. и сверхкороткий туннель.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('summit-expert-turbo-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 540 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    180 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+
+          <div
+            class="group relative bg-slate-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-slon-blue/10 glass-card-hover flex flex-col"
+          >
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src="images/lynx.png"
+                alt="Lynx Commander RE 900 ACE Turbo R 2027"
+                class="w-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                style="height: 80%"
+              />
+            </div>
+            <div class="p-4 sm:p-6 flex flex-col flex-1">
+              <h3
+                class="text-base sm:text-xl font-bold text-white mb-0.5 sm:mb-1"
+              >
+                Lynx Commander RE 900 ACE Turbo R
+              </h3>
+              <p
+                class="text-slon-blue font-semibold text-xs sm:text-base mb-2 sm:mb-3"
+              >
+                Turbo R • 2027
+              </p>
+              <p
+                class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2"
+              >
+                Многозадачный кроссовер на платформе Radien²: 180 л.с., широкая
+                гусеница PowderMax и ходовая EasyRide+ с сенсорным дисплеем
+                10,25″.
+              </p>
+              <button
+                type="button"
+                onclick="openModelModal('lynx-commander-re-2027')"
+                class="inline-flex items-center text-slon-blue hover:text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 transition-colors cursor-pointer w-fit group/link"
+              >
+                Подробнее
+                <i
+                  data-lucide="arrow-right"
+                  class="w-3 h-3 sm:w-4 sm:h-4 ml-1 transition-transform group-hover/link:translate-x-1"
+                ></i>
+              </button>
+              <div class="flex items-end justify-between mb-3 sm:mb-4">
+                <div>
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Цена
+                  </div>
+                  <div class="text-lg sm:text-2xl font-bold text-white">
+                    2 790 000 ₽
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] sm:text-xs text-gray-500 mb-0.5">
+                    Мощность
+                  </div>
+                  <div class="text-sm sm:text-lg font-semibold text-white">
+                    180 л.с.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="tel:+79130185799"
+                class="mt-auto w-full py-2.5 sm:py-3 glass-button text-center rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300"
+              >
+                <i
+                  data-lucide="phone"
+                  class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5"
+                ></i>
+                Позвонить
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="app"
+      class="py-16 sm:py-24 bg-slate-card border-t border-gray-800"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-12">
+          <h2 class="text-2xl sm:text-4xl font-bold mb-4">НАШЕ ПРИЛОЖЕНИЕ</h2>
+          <div class="w-20 h-1 bg-slon-blue mx-auto rounded-full mt-6"></div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-10 sm:mb-12"
+        >
+          <!-- ANDROID — КЛИКАБЕЛЬНАЯ КАРТОЧКА -->
+          <button
+            type="button"
+            onclick="handleInstallClick('android')"
+            class="glass-card p-5 sm:p-6 rounded-2xl border border-gray-700 text-center hover:border-slon-blue transition-all duration-300 cursor-pointer group active:scale-[0.98]"
+          >
+            <div
+              class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 glass-icon rounded-full flex items-center justify-center group-hover:bg-slon-blue/20 transition-colors"
+            >
+              <svg
+                class="w-8 h-8 sm:w-10 sm:h-10 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" />
+              </svg>
+            </div>
+            <h4 class="text-base sm:text-lg font-bold text-white mb-3">
+              Android
+            </h4>
+            <ol
+              class="text-gray-400 text-xs sm:text-sm text-left space-y-1.5 sm:space-y-2"
+            >
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">1.</span> Нажмите
+                «Поделиться»
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">2.</span> Откройте ссылку
+                в Chrome
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">3.</span> Меню ⋮ →
+                «Установить приложение»
+              </li>
+            </ol>
+            <span
+              class="inline-flex items-center mt-4 text-slon-blue text-xs sm:text-sm font-semibold group-hover:text-white transition-colors"
+            >
+              Установить
+              <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+            </span>
+          </button>
+
+          <!-- IPHONE — КЛИКАБЕЛЬНАЯ КАРТОЧКА -->
+          <button
+            type="button"
+            onclick="handleInstallClick('ios')"
+            class="glass-card p-5 sm:p-6 rounded-2xl border border-gray-700 text-center hover:border-slon-blue transition-all duration-300 cursor-pointer group active:scale-[0.98]"
+          >
+            <div
+              class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 glass-icon rounded-full flex items-center justify-center group-hover:bg-slon-blue/20 transition-colors"
+            >
+              <svg
+                class="w-8 h-8 sm:w-10 sm:h-10"
+                viewBox="0 0 24 24"
+                fill="#ffffff"
+              >
+                <path
+                  d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-base sm:text-lg font-bold text-white mb-3">
+              iPhone
+            </h4>
+            <ol
+              class="text-gray-400 text-xs sm:text-sm text-left space-y-1.5 sm:space-y-2"
+            >
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">1.</span> Нажмите
+                «Поделиться»
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">2.</span> Откройте ссылку
+                в Safari
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-slon-blue font-bold">3.</span> «Поделиться» →
+                «На экран «Домой»»
+              </li>
+            </ol>
+            <span
+              class="inline-flex items-center mt-4 text-slon-blue text-xs sm:text-sm font-semibold group-hover:text-white transition-colors"
+            >
+              Установить
+              <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+            </span>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <p class="text-gray-400 mb-6 text-sm sm:text-lg">
+            Установите приложение и всегда будьте в курсе новинок!
+          </p>
+          <button
+            type="button"
+            onclick="handleInstallClick('auto')"
+            class="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-slon-blue hover:bg-slon-blue-hover text-white font-bold rounded-lg transition-all duration-300 shadow-lg shadow-slon-blue/25 hover:shadow-2xl hover:shadow-slon-blue/40 transform hover:scale-105 text-sm sm:text-base cursor-pointer"
+          >
+            <svg
+              class="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+            Установить приложение
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="gallery"
+      class="py-16 sm:py-24 bg-slate-card border-t border-gray-800"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-12">
+          <h2 class="text-2xl sm:text-4xl font-bold mb-4">ГАЛЕРЕЯ И ВИДЕО</h2>
+          <p class="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
+            Смотрите снегоходы в действии и выбирайте лучший для своих задач
+          </p>
+          <div class="w-20 h-1 bg-slon-blue mx-auto rounded-full mt-6"></div>
+        </div>
+
+        <div class="mb-10 sm:mb-12">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+            <div
+              class="glass-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:shadow-2xl hover:shadow-slon-blue/10 group"
+            >
+              <div class="relative aspect-video bg-black">
+                <video controls class="w-full h-full">
+                  <source
+                    src="video/The 2027 Ski-Doo Accessories Lineup.mp4"
+                    type="video/mp4"
+                  />
+                  Ваш браузер не поддерживает видео.
+                </video>
+              </div>
+              <div class="p-4 sm:p-6">
+                <h4 class="font-bold text-base sm:text-lg mb-2">
+                  The 2027 Ski-Doo Accessories Lineup
+                </h4>
+                <p class="text-gray-400 text-xs sm:text-sm">
+                  Модельный ряд аксессуаров Ski-Doo 2027 года позволит вам
+                  повысить комфорт, управляемость и грузоподъемность еще больше,
+                  чем когда-либо.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="glass-card rounded-2xl overflow-hidden border border-gray-800 hover:border-slon-blue/50 transition-all duration-300 hover:shadow-2xl hover:shadow-slon-blue/10 group"
+            >
+              <div class="relative aspect-video bg-black">
+                <video controls class="w-full h-full">
+                  <source
+                    src="video/Presentation du Ski-Doo Freeride 2027.mp4"
+                    type="video/mp4"
+                  />
+                  Ваш браузер не поддерживает видео.
+                </video>
+              </div>
+              <div class="p-4 sm:p-6">
+                <h4 class="font-bold text-base sm:text-lg mb-2">
+                  Ski-Doo Freeride 2027 года
+                </h4>
+                <p class="text-gray-400 text-xs sm:text-sm">
+                  Откройте для себя Ski-Doo Freeride 2027: более легкий, более
+                  экстремальный и созданный для покорения глубокого снега с
+                  бескомпромиссным фристайловым настроем.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div
+              class="relative aspect-square rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/5.jpg"
+                alt="Снегоход в горах"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+            <div
+              class="relative aspect-square rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/1.jpeg"
+                alt="Групповой заезд"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+            <div
+              class="relative aspect-square rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/2.jpeg"
+                alt="Ski-Doo action"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+            <div
+              class="relative aspect-square rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/3.jpeg"
+                alt="Снегоход детали"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+            <div
+              class="relative aspect-[16/9] col-span-2 rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/4.jpeg"
+                alt="Skandic вид сбоку"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+            <div
+              class="relative aspect-[16/9] col-span-2 rounded-xl overflow-hidden group cursor-pointer glass-image"
+            >
+              <img
+                src="images/6.jpeg"
+                alt="Skandic в лесу"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="contacts"
+      class="py-16 sm:py-24 bg-slate-dark border-t border-gray-800"
+    >
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-12">
+          <h2 class="text-2xl sm:text-4xl font-bold mb-4">СВЯЖИТЕСЬ С НАМИ</h2>
+          <p class="text-gray-400 text-sm sm:text-base">Мы всегда на связи</p>
+        </div>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12"
+        >
+          <div
+            class="glass-card p-6 sm:p-8 rounded-2xl border border-slon-blue/30 text-center group hover:border-slon-blue transition-all duration-300"
+          >
+            <div
+              class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 glass-icon rounded-full flex items-center justify-center bg-slon-blue/20"
+            >
+              <i
+                data-lucide="phone"
+                class="w-7 h-7 sm:w-8 sm:h-8 text-slon-blue"
+              ></i>
+            </div>
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+              Позвоните нам
+            </h3>
+            <p class="text-gray-400 text-xs sm:text-sm mb-6">
+              Быстрая консультация по телефону
+            </p>
+            <a
+              href="tel:+79130185799"
+              class="inline-flex items-center justify-center w-full px-6 py-3 bg-slon-blue hover:bg-slon-blue-hover text-white font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-slon-blue/25 btn-primary text-sm sm:text-base"
+            >
+              +7 (913) 018-57-99
+              <i data-lucide="arrow-right" class="ml-2 w-4 h-4"></i>
+            </a>
+          </div>
+
+          <div
+            class="glass-card p-6 sm:p-8 rounded-2xl border border-gray-700 text-center group hover:border-slon-blue transition-all duration-300"
+          >
+            <div
+              class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 glass-icon rounded-full flex items-center justify-center bg-slon-blue/20"
+            >
+              <i
+                data-lucide="map-pin"
+                class="w-7 h-7 sm:w-8 sm:h-8 text-slon-blue"
+              ></i>
+            </div>
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+              Наш адрес
+            </h3>
+            <p class="text-gray-400 text-xs sm:text-sm mb-6">
+              Новосибирск, ул. Инская 39
+            </p>
+            <p class="text-white font-semibold text-sm sm:text-base">
+              Ежедневно 10:00-18:00
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-12 sm:py-16 bg-slate-dark border-t border-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 mb-8 sm:mb-12"
+        >
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 glass-icon rounded-full flex items-center justify-center overflow-hidden"
+              >
+                <img
+                  src="images/logo.png"
+                  alt="x3m"
+                  class="w-10 h-10 object-contain"
+                />
+              </div>
+              <div>
+                <span class="text-lg font-bold block">x3m</span>
+                <span class="text-xs text-gray-500">BRP в Новосибирске</span>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              Снегоходы BRP в наличии и под заказ с доставкой по РФ.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-white font-semibold mb-4">Контакты</h4>
+            <ul class="space-y-3 text-gray-400 text-sm">
+              <li class="flex items-center">
+                <i data-lucide="phone" class="w-4 h-4 mr-2 text-slon-blue"></i>
+                <a
+                  href="tel:+79130185799"
+                  class="hover:text-white transition-colors"
+                  >+7 (913) 018-57-99</a
+                >
+              </li>
+              <li class="flex items-start">
+                <i
+                  data-lucide="map-pin"
+                  class="w-4 h-4 mr-2 text-slon-blue mt-0.5"
+                ></i>
+                <span
+                  >Новосибирск, ул. Инская 39<br /><span
+                    class="text-xs text-gray-500"
+                    >Ежедневно 10:00-18:00</span
+                  ></span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs sm:text-sm gap-4"
+        >
+          <p>&copy; 2026 x3m. Все права защищены.</p>
+          <div class="flex space-x-6">
+            <a
+              href="https://t.me/illisonee"
+              class="hover:text-white transition-colors"
+              >Landing page development</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div id="model-modal" class="fixed inset-0 z-[200] hidden">
+      <div
+        class="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onclick="closeModelModal()"
+      ></div>
+      <div
+        id="model-panel"
+        class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-0 sm:p-6 overflow-hidden"
+      >
+        <div
+          class="relative bg-slate-card border-t sm:border border-gray-700 sm:rounded-2xl w-full sm:max-w-3xl max-h-[90vh] sm:max-h-[85vh] shadow-2xl shadow-slon-blue/20 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 flex flex-col"
+          id="model-content"
+        >
+          <button
+            onclick="closeModelModal()"
+            class="absolute top-3 right-3 z-30 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-slon-blue border border-white/10 hover:border-slon-blue text-gray-300 hover:text-white transition-all duration-200 backdrop-blur-md cursor-pointer"
+            aria-label="Закрыть"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+          <div
+            id="model-scroll"
+            class="overflow-y-auto flex-1 rounded-t-3xl sm:rounded-2xl"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+
+      function scrollToTop(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      const navArrow = document.getElementById("nav-arrow");
+      window.addEventListener("scroll", function () {
+        const scrollY = window.scrollY;
+        if (scrollY > 100) {
+          navArrow.classList.remove("opacity-0", "-translate-x-2");
+          navArrow.classList.add("opacity-100", "translate-x-0");
+        } else {
+          navArrow.classList.remove("opacity-100", "translate-x-0");
+          navArrow.classList.add("opacity-0", "-translate-x-2");
+        }
+      });
+    </script>
+  </body>
+</html>

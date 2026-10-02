@@ -1,0 +1,26 @@
+{
+  "name": "x3m — BRP Ski-Doo Новосибирск",
+  "short_name": "x3m",
+  "description": "Снегоходы BRP Ski-Doo и Lynx. Лучшие цены в Новосибирске.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0063c7",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "images/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

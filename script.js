@@ -6,11 +6,40 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* ============================================================
-     SHARE APP LINK (PWA живёт на отдельном домене)
+     SHARE APP LINK + iOS SAFARI REDIRECT + OVERLAY
      ============================================================ */
 
-  // Ссылка на приложение
   const APP_URL = "http://www.sibxtrim.ru/";
+
+  function isIOS() {
+    return (
+      (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
+  }
+
+  function isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+  }
+
+  function isSafari() {
+    // Safari — единственный браузер на iOS, который не содержит CriOS, FxiOS и т.д.
+    return (
+      isIOS() &&
+      /Safari/.test(navigator.userAgent) &&
+      !/CriOS|FxiOS|EdgiOS|OPiOS|Yandex/.test(navigator.userAgent)
+    );
+  }
+
+  function isInAppBrowser() {
+    // Встроенные браузеры (Telegram, Instagram, VK, Facebook, TikTok и т.д.)
+    const ua = navigator.userAgent || "";
+    return (
+      isIOS() &&
+      (/Instagram|FBAN|FBAV|FB_IAB|Telegram|VK|TikTok|Twitter|Line|Snapchat/i.test(ua) ||
+        !isSafari())
+    );
+  }
 
   async function shareApp() {
     const shareData = {
@@ -19,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
       url: APP_URL,
     };
 
-    // Нативный share (iOS Safari, Android Chrome, Edge, Firefox)
     if (navigator.share) {
       try {
         await navigator.share(shareData);
@@ -30,26 +58,118 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    // Fallback — копируем ссылку в буфер
     try {
       await navigator.clipboard.writeText(APP_URL);
       showToast(
-        "Ссылка скопирована. Откройте её в браузере телефона и установите приложение.",
+        "Ссылка скопирована. Откройте её в Safari и установите приложение.",
       );
     } catch {
-      showToast(
-        "Откройте " + APP_URL + " в браузере телефона и установите приложение.",
-      );
+      showToast("Откройте " + APP_URL + " в Safari и установите приложение.");
     }
     return false;
   }
 
-  // Платформа не важна — share работает одинаково и на iOS, и на Android
-  async function handleInstallClick(/* platform */) {
+  // Открыть ссылку в Safari из встроенного браузера
+  function openInSafari(url) {
+    // x-safari-https:// — недокументированная схема, работает на iOS
+    // для принудительного открытия ссылки в Safari
+    const httpsUrl = url.replace(/^http:/, "https:");
+    const safariUrl = "x-safari-" + httpsUrl;
+    window.location.href = safariUrl;
+  }
+
+  async function handleInstallClick(platform) {
+    // iOS-специфичная логика
+    if (platform === "ios" || (platform === "auto" && isIOS())) {
+      // Если открыто во встроенном браузере (Telegram, Instagram и т.д.) —
+      // пробуем перебросить в Safari
+      if (isInAppBrowser() && !isSafari()) {
+        openInSafari(APP_URL);
+
+        // Если через 1.5 сек всё ещё здесь — показываем оверлей
+        setTimeout(() => {
+          showIOSOverlay();
+        }, 1500);
+        return;
+      }
+
+      // Уже в Safari — показываем оверлей с подсказкой
+      showIOSOverlay();
+      return;
+    }
+
+    // Android / десктоп — обычный share
     await shareApp();
   }
 
-  /* Простой тост */
+  /* ============================================================
+     iOS OVERLAY: подсветка кнопки «Поделиться» в Safari
+     ============================================================ */
+
+  function showIOSOverlay() {
+    const old = document.getElementById("ios-overlay");
+    if (old) old.remove();
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const overlay = document.createElement("div");
+    overlay.id = "ios-overlay";
+    overlay.className = "ios-overlay";
+
+    overlay.innerHTML = `
+      <div class="ios-overlay__backdrop"></div>
+
+      <div class="ios-overlay__top">
+        <div class="ios-overlay__badge">
+          <span class="ios-overlay__step">1</span>
+          <span>Нажмите <strong>«Поделиться»</strong></span>
+        </div>
+        <div class="ios-overlay__arrow-down">
+          <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
+            <path d="M20 0 V 45" stroke="#0063c7" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6">
+              <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+            </path>
+            <path d="M10 38 L 20 50 L 30 38" stroke="#0063c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ios-overlay__pulse"></div>
+
+      <button type="button" class="ios-overlay__close">Понятно</button>
+    `;
+
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+      overlay.classList.add("ios-overlay--visible");
+    });
+
+    const close = () => {
+      overlay.classList.remove("ios-overlay--visible");
+      setTimeout(() => {
+        overlay.remove();
+        document.body.style.overflow = prevOverflow;
+      }, 250);
+    };
+
+    overlay
+      .querySelector(".ios-overlay__close")
+      .addEventListener("click", close);
+    overlay
+      .querySelector(".ios-overlay__backdrop")
+      .addEventListener("click", close);
+
+    setTimeout(() => {
+      if (document.getElementById("ios-overlay")) close();
+    }, 12000);
+  }
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+
   function showToast(message) {
     let toast = document.getElementById("app-toast");
     if (!toast) {
@@ -88,9 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 3500);
   }
 
-  // Экспорт в глобальную область
   window.handleInstallClick = handleInstallClick;
   window.shareApp = shareApp;
+  window.showIOSOverlay = showIOSOverlay;
 
   /* ============================================================
      КОНЕЦ SHARE-БЛОКА
@@ -438,6 +558,20 @@ const MODELS_DATA = {
       "Премиальный комфорт и 180 л.с.",
     ],
   },
+  "expedition-xtreme-2027": {
+    title: "BRP EXPEDITION XTREME 900 ACE TURBO R",
+    subtitle: "900 ACE Turbo R • 180 л.с. • 2027",
+    price: "2 520 000 ₽",
+    description:
+      "Премиальный кроссовер на платформе REV Gen5 с 180-сильным турбомотором и широкой гусеницей 50 сантиметров. Создан для тех, кто хочет максимум возможностей — от дальних экспедиций до агрессивного катания по целине.",
+    image: "images/expedition-xtreme.png",
+    features: [
+      "Платформа REV Gen5",
+      "Турбированный двигатель 900 ACE Turbo R • 180 л.с.",
+      "Гусеница 50 см (20 дюймов)",
+      "Премиальный пакет оснащения Expedition Xtreme",
+    ],
+  },
   "summit-expert-turbo-2027": {
     title: "BRP SUMMIT EXPERT TURBO R",
     subtitle: "Turbo R • 180 л.с.",
@@ -464,20 +598,6 @@ const MODELS_DATA = {
       "Ходовая EasyRide+",
       "Широкая гусеница PowderMax",
       'Сенсорный дисплей 10,25"',
-    ],
-  },
-    "expedition-xtreme-2027": {
-    title: "BRP EXPEDITION XTREME 900 ACE TURBO R",
-    subtitle: "900 ACE Turbo R • 180 л.с. • 2027",
-    price: "2 520 000 ₽",
-    description:
-      "Премиальный кроссовер на платформе REV Gen5 с 180-сильным турбомотором и широкой гусеницей 50 сантиметров. Создан для тех, кто хочет максимум возможностей — от дальних экспедиций до агрессивного катания по целине.",
-    image: "images/expedition-xtreme.png",
-    features: [
-      "Платформа REV Gen5",
-      "Турбированный двигатель 900 ACE Turbo R • 180 л.с.",
-      "Гусеница 50 см (20 дюймов)",
-      "Премиальный пакет оснащения Expedition Xtreme",
     ],
   },
 };

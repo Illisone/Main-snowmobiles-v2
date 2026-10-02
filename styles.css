@@ -456,3 +456,190 @@ button {
     display: none;
   }
 }
+/* ============================================================
+   iOS OVERLAY — подсветка кнопки «Поделиться» в Safari
+   ============================================================ */
+
+.ios-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.ios-overlay--visible {
+  opacity: 1;
+}
+
+.ios-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+/* Подсказка сверху */
+.ios-overlay__top {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  animation: ios-fade-in 0.4s ease 0.15s both;
+}
+
+.ios-overlay__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(0, 99, 199, 0.5);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(0, 99, 199, 0.15);
+  white-space: nowrap;
+}
+
+.ios-overlay__badge strong {
+  color: #4d9eff;
+  font-weight: 700;
+}
+
+.ios-overlay__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #0063c7;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.ios-overlay__arrow-down {
+  animation: ios-bounce-down 1.2s ease-in-out infinite;
+}
+
+@keyframes ios-bounce-down {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes ios-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Пульсирующий круг внизу экрана, где кнопка «Поделиться» в Safari */
+.ios-overlay__pulse {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #0063c7;
+  pointer-events: none;
+  animation: ios-pulse 1.6s ease-out infinite;
+}
+
+.ios-overlay__pulse::before,
+.ios-overlay__pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 3px solid #0063c7;
+  animation: ios-pulse 1.6s ease-out infinite;
+}
+
+.ios-overlay__pulse::before {
+  animation-delay: 0.4s;
+}
+
+.ios-overlay__pulse::after {
+  animation-delay: 0.8s;
+}
+
+@keyframes ios-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Кнопка «Понятно» */
+.ios-overlay__close {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 36px;
+  background: #0063c7;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 99, 199, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ios-overlay__close:active {
+  transform: translateX(-50%) scale(0.95);
+  box-shadow: 0 5px 15px rgba(0, 99, 199, 0.4);
+}
+
+/* На десктопе оверлей не нужен — но на всякий оставим рабочим */
+@media (min-width: 1024px) {
+  .ios-overlay__pulse {
+    display: none;
+  }
+  .ios-overlay__top {
+    top: 20%;
+  }
+  .ios-overlay__close {
+    bottom: auto;
+    top: 60%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ios-overlay__arrow-down,
+  .ios-overlay__pulse,
+  .ios-overlay__pulse::before,
+  .ios-overlay__pulse::after {
+    animation: none;
+  }
+}
